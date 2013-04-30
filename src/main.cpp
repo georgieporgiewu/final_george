@@ -42,6 +42,11 @@ using namespace std;
 using namespace Eigen;
 //using namespace std::chrono;
 
+GLenum shadeModel = GL_SMOOTH;
+
+// for triangle wireframe
+GLenum polygonMode = GL_LINE;
+
 // trying out timer
 
 
@@ -80,6 +85,8 @@ GLuint floorTexture;
 // how tesselated is each patch?
 int patchTesselation = 5;
 
+float zoom = 8;
+
 
 
 //****************************************************
@@ -114,7 +121,7 @@ void myReshape(int w, int h) {
   // glOrtho(-1, 1 + (w-400)/200.0 , -1 -(h-400)/200.0, 1, 1, -1); // resize type = add
   // glOrtho(-w/400.0, w/400.0, -h/400.0, h/400.0, 1, -1); // resize type = center
 
-  glOrtho(-1, 1, -1, 1, 1, -1);    // resize type = stretch
+  glOrtho(-4, 4, -4, 4, 1, -1);    // resize type = stretch
 
   //------------------------------------------------------------
 }
@@ -548,9 +555,16 @@ void RenderFrame()
 	
 	//glutWireTeapot(1.0);
 	
-	glColor3f (1.0, 1.0, 1.0);
+	glEnable(GL_DEPTH_TEST);
+	
+	glOrtho(-1.0*zoom, 1.0*zoom, -1.0*zoom, 1.0*zoom, -4.0, 4.0);
+	
+	glShadeModel(shadeModel);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);	
+
+	glColor3f (0.3, 0.8, 1.0);
 	//glTranslatef(0.0f, 0.0f, -28.0f);
-	glutSolidSphere(0.2, 48, 24);
+	glutSolidSphere(sphereRadius, 48, 24);
 	
 	/*** 
 	//triangle works....
@@ -587,8 +601,8 @@ void RenderFrame()
 	
 	***/
 	
-	
-	
+	glColor3f (1.0, 0.5, 0.3);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	//Draw cloth as triangles
 	if(drawTriangles)
 	{
@@ -620,7 +634,7 @@ void RenderFrame()
 					***/
 					glVertex3f(currentP[i*gridSize+j].position(0),
 						currentP[i*gridSize+j].position(1),
-						currentP[i*gridSize+j].position(2));
+						0);
 					/***
 					glNormal3f(currentP[i*gridSize+j+1].normal(0),
 						currentP[i*gridSize+j+1].normal(1),
@@ -628,7 +642,7 @@ void RenderFrame()
 					***/
 					glVertex3f(currentP[i*gridSize+j+1].position(0),
 						currentP[i*gridSize+j+1].position(1),
-						currentP[i*gridSize+j+1].position(2));
+						0);
 					/***	
 					glNormal3f(currentP[(i+1)*gridSize+j].normal(0),
 						currentP[(i+1)*gridSize+j].normal(1),
@@ -636,7 +650,7 @@ void RenderFrame()
 					***/	
 					glVertex3f(currentP[(i+1)*gridSize+j].position(0),
 						currentP[(i+1)*gridSize+j].position(1),
-						currentP[(i+1)*gridSize+j].position(2));
+						0);
 						
 					glEnd();
 					
@@ -648,7 +662,7 @@ void RenderFrame()
 					***/	
 					glVertex3f(currentP[(i+1)*gridSize+j].position(0),
 						currentP[(i+1)*gridSize+j].position(1),
-						currentP[(i+1)*gridSize+j].position(2));
+						0);
 					/***	
 					glNormal3f(currentP[i*gridSize+j+1].normal(0),
 						currentP[i*gridSize+j+1].normal(1),
@@ -656,7 +670,7 @@ void RenderFrame()
 					***/	
 					glVertex3f(currentP[i*gridSize+j+1].position(0),
 						currentP[i*gridSize+j+1].position(1),
-						currentP[i*gridSize+j+1].position(2));
+						0);
 					/***	
 					glNormal3f(currentP[(i+1)*gridSize+j+1].normal(0),
 						currentP[(i+1)*gridSize+j+1].normal(1),
@@ -664,7 +678,7 @@ void RenderFrame()
 					***/	
 					glVertex3f(currentP[(i+1)*gridSize+j+1].position(0),
 						currentP[(i+1)*gridSize+j+1].position(1),
-						currentP[(i+1)*gridSize+j+1].position(2));
+						0);
 						
 					glEnd();
 				}
@@ -837,8 +851,8 @@ int main(int argc, char *argv[]) {
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 
   // Initalize theviewport size
-  viewport.w = 640;
-  viewport.h = 480;
+  viewport.w = 800;
+  viewport.h = 800;
 
   //The size and position of the window
   glutInitWindowSize(viewport.w, viewport.h);
