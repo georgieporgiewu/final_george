@@ -1,0 +1,25 @@
+Final Project Proposal
+
+Team Members:
+Yerin Kim (cs184-ah), George Wu (cs184-cc)
+
+Description:
+The project we are pursuing is the cloth simulation, in which realistic animations of cloth sheets are shown. The cloth simulation will show a piece of cloth material draping down and moving in response to gravity and air resistance.
+
+Methods:
+We will utilize C++ and OpenGL.
+
+Task Division:
+The tasks required for this project are creating classes for cloth, cloth particles, constraints (i.e. wind, etc.), and vector. With these main components of the projects outlined, we will divide up the work by splitting the particles and constraint aspects of the cloth between the two of us. After, we would divide up the work needed in the cloth class by the design of the cloth, including shading, and the animation of the cloth.
+
+For example:
+Yerin - Constraints, cloth design
+George - particles, animation
+
+Extra:
+If things go well, we plan to attempt some or all of the following specs:
+- simulations of different cloth material
+- simulations of cloth interacting with various objects (for example, a ball)
+- toggles for wireframe mode, play/pause simulation, etc.
+- adding wind to the simulation environment
+
