@@ -125,9 +125,14 @@ void myReshape(int w, int h) {
 //****************************************************
 void initScene(){
 
-/***
+
+
+  //this section from example_00
+  
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Clear to black, fully transparent
   
+  
+  /***
   glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);
   glEnable(GL_NORMALIZE);
@@ -141,12 +146,22 @@ void initScene(){
   glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
   glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
   glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+  ***/
 
   myReshape(viewport.w,viewport.h);
-***/
+  
+  //end this section
 
-  //set up projection matrix
+
+  /***
+
+  //this section from Paul's, edited though
+  
+  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+  
   glViewport(0, 0, 640, 480);
+  
+  //set up projection matrix
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   gluPerspective(45.0f, 640/480, 1.0f, 100.0f);
@@ -179,8 +194,12 @@ void initScene(){
   
   //Use 2-sided lighting
   glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, true);
+  
+  //end Paul's section
 
-  glOrtho(-1, 1, -1, 1, 1, -1); 
+  //glOrtho(-4, 4, -4, 4, 1, -1); 
+  
+  ***/
   
 }
 
@@ -521,9 +540,28 @@ void UpdateFrame() {
 //render a frame
 void RenderFrame()
 {
+
 	//Clear buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();										//reset modelview matrix
+	
+	//glutWireTeapot(1.0);
+	
+	glColor3f (1.0, 1.0, 1.0);
+	//glTranslatef(0.0f, 0.0f, -28.0f);
+	glutSolidSphere(0.2, 48, 24);
+	
+	/*** 
+	//triangle works....
+	glBegin(GL_POLYGON);
+	glVertex3f(-0.5f, -0.5f, 0.0f);
+	glVertex3f(0.5f, -0.5f, 0.0f);
+	glVertex3f(0.0f, 0.5f, 0.0f);
+	glEnd();
+	***/
+	
+	/***
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
 	glTranslatef(0.0f, 0.0f, -28.0f);
@@ -544,12 +582,17 @@ void RenderFrame()
 			
 	glDisable(GL_LIGHTING);
 	glDisable(GL_CULL_FACE);
-	//glMaterialfv(GL_FRONT, GL_SPECULAR, black);
+	GLfloat mat4 [] = {0.0f, 0.0f, 0.0f, 0.0f};
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat4);
+	
+	***/
+	
+	
 	
 	//Draw cloth as triangles
 	if(drawTriangles)
 	{
-		
+		/***
 		glEnable(GL_LIGHTING);
 		GLfloat tri_mat1 [] = {0.8f, 0.0f, 1.0f};
 		GLfloat tri_mat2 [] = {0.8f, 0.0f, 1.0f};
@@ -559,58 +602,81 @@ void RenderFrame()
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, tri_mat2);
 		glMaterialfv(GL_BACK, GL_AMBIENT, tri_mat3);
 		glMaterialfv(GL_BACK, GL_DIFFUSE, tri_mat4);
+		***/
 		
-		glBegin(GL_TRIANGLES);
+		//glBegin(GL_TRIANGLES);
 		{
 			for(int i=0; i<gridSize-1; ++i)
 			{
 				for(int j=0; j<gridSize-1; ++j)
 				{
 					//cout << "drawing triangles!" << endl;
-					//cout << currentP[i*gridSize+j].normal << endl << endl;
+					//cout << currentP[i*gridSize+j].position << endl << endl;
+					glBegin(GL_POLYGON);
+					/***
 					glNormal3f(currentP[i*gridSize+j].normal(0),
 						currentP[i*gridSize+j].normal(1),
 						currentP[i*gridSize+j].normal(2));
+					***/
 					glVertex3f(currentP[i*gridSize+j].position(0),
 						currentP[i*gridSize+j].position(1),
 						currentP[i*gridSize+j].position(2));
+					/***
 					glNormal3f(currentP[i*gridSize+j+1].normal(0),
 						currentP[i*gridSize+j+1].normal(1),
 						currentP[i*gridSize+j+1].normal(2));
+					***/
 					glVertex3f(currentP[i*gridSize+j+1].position(0),
 						currentP[i*gridSize+j+1].position(1),
 						currentP[i*gridSize+j+1].position(2));
+					/***	
 					glNormal3f(currentP[(i+1)*gridSize+j].normal(0),
 						currentP[(i+1)*gridSize+j].normal(1),
 						currentP[(i+1)*gridSize+j].normal(2));
+					***/	
 					glVertex3f(currentP[(i+1)*gridSize+j].position(0),
 						currentP[(i+1)*gridSize+j].position(1),
 						currentP[(i+1)*gridSize+j].position(2));
-
+						
+					glEnd();
+					
+					glBegin(GL_POLYGON);
+					/***
 					glNormal3f(currentP[(i+1)*gridSize+j].normal(0),
 						currentP[(i+1)*gridSize+j].normal(1),
 						currentP[(i+1)*gridSize+j].normal(2));
+					***/	
 					glVertex3f(currentP[(i+1)*gridSize+j].position(0),
 						currentP[(i+1)*gridSize+j].position(1),
 						currentP[(i+1)*gridSize+j].position(2));
+					/***	
 					glNormal3f(currentP[i*gridSize+j+1].normal(0),
 						currentP[i*gridSize+j+1].normal(1),
 						currentP[i*gridSize+j+1].normal(2));
+					***/	
 					glVertex3f(currentP[i*gridSize+j+1].position(0),
 						currentP[i*gridSize+j+1].position(1),
 						currentP[i*gridSize+j+1].position(2));
+					/***	
 					glNormal3f(currentP[(i+1)*gridSize+j+1].normal(0),
 						currentP[(i+1)*gridSize+j+1].normal(1),
 						currentP[(i+1)*gridSize+j+1].normal(2));
+					***/	
 					glVertex3f(currentP[(i+1)*gridSize+j+1].position(0),
 						currentP[(i+1)*gridSize+j+1].position(1),
 						currentP[(i+1)*gridSize+j+1].position(2));
+						
+					glEnd();
 				}
 			}
 		}
-		glEnd();
-		glDisable(GL_LIGHTING);
+		//glEnd();
+		//glDisable(GL_LIGHTING);
 	}
+	
+	
+	glFlush();
+	glutSwapBuffers();
 	
 }
 
@@ -771,8 +837,8 @@ int main(int argc, char *argv[]) {
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 
   // Initalize theviewport size
-  viewport.w = 400;
-  viewport.h = 400;
+  viewport.w = 640;
+  viewport.h = 480;
 
   //The size and position of the window
   glutInitWindowSize(viewport.w, viewport.h);
