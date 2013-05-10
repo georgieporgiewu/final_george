@@ -91,6 +91,9 @@ float zoom = 12;
 //wind direction, changed by w a s d keys
 int windDirection = 0;
 
+//click l to let go of cloth, to land on ball wheeee
+int letGo = 0;
+
 
 
 //****************************************************
@@ -287,6 +290,7 @@ void ResetCloth()
 		}
 	}
 	
+	
 	//Fix the top left & top right balls in place
 	p1[63].fixed=true;                            //0
 	p1[72].fixed=true;                   //gridSize-1
@@ -294,10 +298,13 @@ void ResetCloth()
 	//Fix the bottom left & bottom right balls
 	p1[153].fixed=true;        //gridSize*(gridSize-1)
 	p1[162].fixed=true;          //gridSize*gridSize-1
+	
+	
 	/***
 	p1[0].fixed = true;
 	p1[gridSize-1].fixed = true;
 	***/
+	
 	//Copy the balls into the other array
 	for(int i=0; i<numP; ++i)
 		p2[i]=p1[i];
@@ -409,12 +416,31 @@ void ResetCloth()
 
 //perform per frame updates
 void UpdateFrame() {
-	currentP[0].fixed = true;
-	currentP[gridSize-1].fixed = true;
-	currentP[gridSize*(gridSize-1)].fixed = false;
-	currentP[gridSize*gridSize-1].fixed = false;
 	
-	usleep(1000);
+	if (letGo == 0) {
+		//Fix the top left & top right balls in place
+		currentP[63].fixed=true;                            //0
+		currentP[72].fixed=true;                   //gridSize-1
+	
+		//Fix the bottom left & bottom right balls
+		currentP[153].fixed=true;        //gridSize*(gridSize-1)
+		currentP[162].fixed=true;          //gridSize*gridSize-1
+		currentP[0].fixed = true;
+		currentP[gridSize-1].fixed = true;
+	} else {
+		//Fix the top left & top right balls in place
+		currentP[63].fixed=false;                            //0
+		currentP[72].fixed=false;                   //gridSize-1
+	
+		//Fix the bottom left & bottom right balls
+		currentP[153].fixed=false;        //gridSize*(gridSize-1)
+		currentP[162].fixed=false;          //gridSize*gridSize-1
+		currentP[0].fixed = false;
+		currentP[gridSize-1].fixed = false;
+	}
+	
+	
+	usleep(4000);
 	
 	float timePassedInSeconds = 0.01f;
 
@@ -444,7 +470,7 @@ void UpdateFrame() {
 			windDirVect << -.3,0,0;
 			break;
 		case 4:
-			windDirVect << .3,0,0;
+			windDirVect << .2,0,0;
 			break;
 	}
 
@@ -483,7 +509,6 @@ void UpdateFrame() {
 			windForces[(i+1)*gridSize+j+1] += tri2_force;
 		}
 	}
-	
 	
 	
 	//Calculate the nextP from the currentP
@@ -557,7 +582,7 @@ void UpdateFrame() {
 			}
 		}
 	}
-	//cout << "here2" << endl;
+
 	//Swap the currentP and newBalls pointers
 	Particles * temp=currentP;
 	currentP=nextP;
@@ -630,7 +655,7 @@ void RenderFrame()
 
 	glTranslatef(0,0,-1.5);
 
-	/***
+	
 	//sphere
 
 	glEnable(GL_LIGHTING);
@@ -649,7 +674,7 @@ void RenderFrame()
 	GLfloat mat4 [] = {0.0f, 0.0f, 0.0f, 0.0f};
 	glMaterialfv(GL_FRONT, GL_SPECULAR, mat4);
 	
-	***/
+	
 	
 	
 	
@@ -827,6 +852,19 @@ void mykeyFunc(unsigned char key, int x, int y){
 			} else {
 				polygonMode = GL_LINE;
 			}
+			break;
+		case 'r' :
+			ResetCloth();
+			break;
+		case 'l' :
+			if (letGo == 0) {
+				letGo = 1;
+			} else {
+				letGo = 0;
+			}
+			break;
+		case 27 :
+			exit(0);
 			break;
 	}
   
