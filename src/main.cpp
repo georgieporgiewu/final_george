@@ -55,12 +55,12 @@ GLenum polygonMode = GL_FILL;
 Vector3f gravity(0.0f, -0.98f, 0.0f);
 
 //number of particles grid
-const int gridSize = 32;
+const int gridSize = 23;
 
 //Spring properties
 int numS;
 float springConst = 10.0f;
-float restLength = 0.45f;
+float restLength = 0.65f;
 float damper = 0.1f;
 Spring * springs = NULL;
 
