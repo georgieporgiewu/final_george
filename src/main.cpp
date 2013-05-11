@@ -55,12 +55,12 @@ GLenum polygonMode = GL_FILL;
 Vector3f gravity(0.0f, -0.98f, 0.0f);
 
 //number of particles grid
-const int gridSize = 23;
+const int gridSize = 18;
 
 //Spring properties
 int numS;
 float springConst = 10.0f;
-float restLength = 0.65f;
+float restLength = 0.8f;
 float damper = 0.1f;
 Spring * springs = NULL;
 
@@ -294,18 +294,18 @@ void ResetCloth()
 	
 	
 	//Fix the top left & top right balls in place
-	p1[63].fixed=true;                            //0
-	p1[72].fixed=true;                   //gridSize-1
+	p1[0].fixed=true;                            //0
+	p1[17].fixed=true;                   //gridSize-1
 	
 	//Fix the bottom left & bottom right balls
-	p1[153].fixed=false;        //gridSize*(gridSize-1)
-	p1[162].fixed=false;          //gridSize*gridSize-1
+	//p1[238].fixed=false;        //gridSize*(gridSize-1)
+	//p1[248].fixed=false;          //gridSize*gridSize-1
 	
 	
-	/***
+	
 	p1[0].fixed = true;
 	p1[gridSize-1].fixed = true;
-	***/
+	
 	
 	//Copy the balls into the other array
 	for(int i=0; i<numP; ++i)
@@ -421,27 +421,27 @@ void UpdateFrame() {
 
 	if (letGo == 0) {
 		//Fix the top left & top right balls in place
-		currentP[63].fixed=false;                            //0
-		currentP[72].fixed=false;                   //gridSize-1
+		currentP[0].fixed=true;                            //0
+		currentP[17].fixed=true;                   //gridSize-1
 		//Fix the bottom left & bottom right balls
-		currentP[153].fixed=false;        //gridSize*(gridSize-1)
-		currentP[162].fixed=false;          //gridSize*gridSize-1
-		currentP[0].fixed = false;
-		currentP[gridSize-1].fixed = false;
+		//currentP[238].fixed=true;        //gridSize*(gridSize-1)
+		//currentP[248].fixed=true;          //gridSize*gridSize-1
+		currentP[0].fixed = true;
+		currentP[gridSize-1].fixed = true;
 	} else {
 		//Fix the top left & top right balls in place
-		currentP[63].fixed=false;                            //0
-		currentP[72].fixed=false;                   //gridSize-1
+		currentP[0].fixed=false;                            //0
+		currentP[17].fixed=false;                   //gridSize-1
 	
 		//Fix the bottom left & bottom right balls
-		currentP[153].fixed=false;        //gridSize*(gridSize-1)
-		currentP[162].fixed=false;          //gridSize*gridSize-1
+		//currentP[238].fixed=false;        //gridSize*(gridSize-1)
+		//currentP[248].fixed=false;          //gridSize*gridSize-1
 		currentP[0].fixed = false;
 		currentP[gridSize-1].fixed = false;
 	}
 	
 	
-	usleep(4000);
+	//usleep(4000);
 	
 	float timePassedInSeconds = 0.01f;
 
@@ -529,6 +529,7 @@ void UpdateFrame() {
 		}
 		else
 		{
+			
 			//Calculate the force on this ball
 			Vector3f force=gravity + windForces[i];
 
@@ -720,10 +721,10 @@ void RenderFrame()
 	{
 		
 		glEnable(GL_LIGHTING);
-		GLfloat tri_mat3 [] = {0.2f, 0.0f, 0.0f};
-		GLfloat tri_mat4 [] = {0.35f, 0.0f, 0.0f};
-		GLfloat tri_mat1 [] = {0.5f, 0.5f, 0.5f};
-		GLfloat tri_mat2 [] = {0.5f, 0.5f, 0.5f};
+		GLfloat tri_mat3 [] = {0.6f, 1.0f, 1.0f};
+		GLfloat tri_mat4 [] = {0.4f, 1.0f, 1.0f};
+		GLfloat tri_mat1 [] = {0.6f, 1.0f, 1.0f};
+		GLfloat tri_mat2 [] = {0.4f, 1.0f, 1.0f};
 		glMaterialfv(GL_FRONT, GL_AMBIENT, tri_mat1);	//set material
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, tri_mat2);
 		glMaterialfv(GL_BACK, GL_AMBIENT, tri_mat3);
