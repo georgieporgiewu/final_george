@@ -55,13 +55,13 @@ GLenum polygonMode = GL_FILL;
 Vector3f gravity(0.0f, -0.98f, 0.0f);
 
 //number of particles grid
-const int gridSize = 15;
+const int gridSize = 32;
 
 //Spring properties
 int numS;
 float springConst = 10.0f;
-float restLength = 1.0f;
-float damper = 0.8f;
+float restLength = 0.45f;
+float damper = 0.1f;
 Spring * springs = NULL;
 
 //Particle properties
@@ -144,7 +144,6 @@ void initScene(){
   //this section from example_00
   
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Clear to black, fully transparent
-  
   
   /***
   glEnable(GL_LIGHTING);
@@ -284,6 +283,9 @@ void ResetCloth()
 			p1[i*gridSize+j].position << float(j)-float(gridSize-1)/2,
 												 8.5f,
 												 float(i)-float(gridSize-1)/2;
+			p1[i*gridSize+j].prevPosition << float(j)-float(gridSize-1)/2,
+												 8.5f,
+												 float(i)-float(gridSize-1)/2;
 			p1[i*gridSize+j].velocity << 0,0,0;
 			p1[i*gridSize+j].mass=mass;
 			p1[i*gridSize+j].fixed=false;
@@ -296,8 +298,8 @@ void ResetCloth()
 	p1[72].fixed=true;                   //gridSize-1
 	
 	//Fix the bottom left & bottom right balls
-	p1[153].fixed=true;        //gridSize*(gridSize-1)
-	p1[162].fixed=true;          //gridSize*gridSize-1
+	p1[153].fixed=false;        //gridSize*(gridSize-1)
+	p1[162].fixed=false;          //gridSize*gridSize-1
 	
 	
 	/***
@@ -416,17 +418,16 @@ void ResetCloth()
 
 //perform per frame updates
 void UpdateFrame() {
-	
+
 	if (letGo == 0) {
 		//Fix the top left & top right balls in place
-		currentP[63].fixed=true;                            //0
-		currentP[72].fixed=true;                   //gridSize-1
-	
+		currentP[63].fixed=false;                            //0
+		currentP[72].fixed=false;                   //gridSize-1
 		//Fix the bottom left & bottom right balls
-		currentP[153].fixed=true;        //gridSize*(gridSize-1)
-		currentP[162].fixed=true;          //gridSize*gridSize-1
-		currentP[0].fixed = true;
-		currentP[gridSize-1].fixed = true;
+		currentP[153].fixed=false;        //gridSize*(gridSize-1)
+		currentP[162].fixed=false;          //gridSize*gridSize-1
+		currentP[0].fixed = false;
+		currentP[gridSize-1].fixed = false;
 	} else {
 		//Fix the top left & top right balls in place
 		currentP[63].fixed=false;                            //0
@@ -556,37 +557,37 @@ void UpdateFrame() {
 			}
 			
 			
-
 			//Calculate the acceleration
 			Vector3f acceleration=force/currentP[i].mass;
 		
+			currentP[i].velocity = currentP[i].position - currentP[i].prevPosition;
+			float timeStepSq = (float)timePassedInSeconds * (float)timePassedInSeconds;
+			
 			//Update velocity
-			nextP[i].velocity=currentP[i].velocity+acceleration*
-																(float)timePassedInSeconds;
+			nextP[i].velocity=currentP[i].velocity*(1.0-damper);
+			nextP[i].prevPosition = currentP[i].position;
 
-			//Damp the velocity
-			nextP[i].velocity*=damper;
-		
 			//Calculate new position
-			nextP[i].position=currentP[i].position+
-				(nextP[i].velocity+currentP[i].velocity)*(float)timePassedInSeconds/2;
+			nextP[i].position=currentP[i].position + nextP[i].velocity+acceleration*timeStepSq;;
+			acceleration = Vector3f(0,0,0);
 
 			//Check against sphere (at origin)
 			if((nextP[i].position.norm()*nextP[i].position.norm())<sphereRadius*1.08f*sphereRadius*1.08f)
-				nextP[i].position=nextP[i].position.normalized()*
-																		sphereRadius*1.08f;
-
+				nextP[i].position=nextP[i].position.normalized()*sphereRadius*1.08f;
+			
 			//Check against floor
 			if(nextP[i].position(1) < (-8.5f)) {
 				nextP[i].position(1)=-8.5f;
+				nextP[i].velocity << 0,0,0;
 			}
+
 		}
 	}
 
 	//Swap the currentP and newBalls pointers
 	Particles * temp=currentP;
 	currentP=nextP;
-	nextP=currentP;
+	nextP=temp;
 	
 	//calculate normals, because positions are always updated :]
 	
@@ -659,13 +660,13 @@ void RenderFrame()
 	//sphere
 
 	glEnable(GL_LIGHTING);
-	GLfloat mat1 [] = {1.0f, 0.0f, 0.0f, 0.0f};
-	GLfloat mat2 [] = {1.0f, 0.0f, 0.0f, 0.0f};
+	GLfloat mat1 [] = {1.0f, 1.0f, 1.0f, 0.5f};
+	GLfloat mat2 [] = {1.0f, 1.0f, 1.0f, 0.5f};
 	GLfloat mat3 [] = {1.0f, 1.0f, 1.0f, 1.0f};
 	glMaterialfv(GL_FRONT, GL_AMBIENT, mat1);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat2);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, mat3);
-	glMaterialf(GL_FRONT, GL_SHININESS, 32.0f);
+	glMaterialf(GL_FRONT, GL_SHININESS, 30.0f);
 	glEnable(GL_CULL_FACE);
 	glTranslatef(0,0,-1.5);
 	glutSolidSphere(sphereRadius, 48, 24);
@@ -719,15 +720,14 @@ void RenderFrame()
 	{
 		
 		glEnable(GL_LIGHTING);
-		GLfloat tri_mat3 [] = {1.0f, 0.5f, 0.31f};
-		GLfloat tri_mat4 [] = {1.0f, 0.5f, 0.31f};
-		GLfloat tri_mat1 [] = {1.0f, 1.0f, 0.0f};
-		GLfloat tri_mat2 [] = {1.0f, 1.0f, 0.0f};
+		GLfloat tri_mat3 [] = {0.2f, 0.0f, 0.0f};
+		GLfloat tri_mat4 [] = {0.35f, 0.0f, 0.0f};
+		GLfloat tri_mat1 [] = {0.5f, 0.5f, 0.5f};
+		GLfloat tri_mat2 [] = {0.5f, 0.5f, 0.5f};
 		glMaterialfv(GL_FRONT, GL_AMBIENT, tri_mat1);	//set material
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, tri_mat2);
 		glMaterialfv(GL_BACK, GL_AMBIENT, tri_mat3);
 		glMaterialfv(GL_BACK, GL_DIFFUSE, tri_mat4);
-		
 		
 		
 		//glBegin(GL_TRIANGLES);

@@ -10,6 +10,7 @@ using namespace std;
 class Particles {
 public:
 	Vector3f position;
+	Vector3f prevPosition;
 	Vector3f velocity;
 	
 	float mass;
