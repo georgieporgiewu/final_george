@@ -60,7 +60,7 @@ const int gridSize = 18;
 //Spring properties
 int numS;
 float springConst = 10.0f;
-float restLength = 0.8f;
+float restLength = 0.9f;
 float damper = 0.1f;
 Spring * springs = NULL;
 
@@ -286,7 +286,6 @@ void ResetCloth()
 			p1[i*gridSize+j].prevPosition << float(j)-float(gridSize-1)/2,
 												 8.5f,
 												 float(i)-float(gridSize-1)/2;
-			p1[i*gridSize+j].velocity << 0,0,0;
 			p1[i*gridSize+j].mass=mass;
 			p1[i*gridSize+j].fixed=false;
 		}
@@ -294,12 +293,12 @@ void ResetCloth()
 	
 	
 	//Fix the top left & top right balls in place
-	p1[0].fixed=true;                            //0
-	p1[17].fixed=true;                   //gridSize-1
+	p1[76].fixed=true;                            //0
+	p1[86].fixed=true;                   //gridSize-1
 	
 	//Fix the bottom left & bottom right balls
-	//p1[238].fixed=false;        //gridSize*(gridSize-1)
-	//p1[248].fixed=false;          //gridSize*gridSize-1
+	p1[238].fixed=false;        //gridSize*(gridSize-1)
+	p1[248].fixed=false;          //gridSize*gridSize-1
 	
 	
 	
@@ -421,21 +420,21 @@ void UpdateFrame() {
 
 	if (letGo == 0) {
 		//Fix the top left & top right balls in place
-		currentP[0].fixed=true;                            //0
-		currentP[17].fixed=true;                   //gridSize-1
+		currentP[76].fixed=true;                            //0
+		currentP[86].fixed=true;                   //gridSize-1
 		//Fix the bottom left & bottom right balls
-		//currentP[238].fixed=true;        //gridSize*(gridSize-1)
-		//currentP[248].fixed=true;          //gridSize*gridSize-1
+		currentP[238].fixed=true;        //gridSize*(gridSize-1)
+		currentP[248].fixed=true;          //gridSize*gridSize-1
 		currentP[0].fixed = true;
 		currentP[gridSize-1].fixed = true;
 	} else {
 		//Fix the top left & top right balls in place
-		currentP[0].fixed=false;                            //0
-		currentP[17].fixed=false;                   //gridSize-1
+		currentP[76].fixed=false;                            //0
+		currentP[86].fixed=false;                   //gridSize-1
 	
 		//Fix the bottom left & bottom right balls
-		//currentP[238].fixed=false;        //gridSize*(gridSize-1)
-		//currentP[248].fixed=false;          //gridSize*gridSize-1
+		currentP[238].fixed=false;        //gridSize*(gridSize-1)
+		currentP[248].fixed=false;          //gridSize*gridSize-1
 		currentP[0].fixed = false;
 		currentP[gridSize-1].fixed = false;
 	}
@@ -519,13 +518,11 @@ void UpdateFrame() {
 		nextP[i].fixed=currentP[i].fixed;
 		nextP[i].mass=currentP[i].mass;
 
-		//If the ball is fixed, transfer the position and zero the velocity, otherwise calculate
+		//If the ball is fixed, transfer the position, otherwise calculate
 		//the new values
 		if(currentP[i].fixed)
 		{
 			nextP[i].position=currentP[i].position;
-			Vector3f zeroVect(0,0,0);
-			nextP[i].velocity = zeroVect;
 		}
 		else
 		{
@@ -557,19 +554,14 @@ void UpdateFrame() {
 				}
 			}
 			
-			
+			float timeStepSq = (float)timePassedInSeconds * (float)timePassedInSeconds;
+
 			//Calculate the acceleration
 			Vector3f acceleration=force/currentP[i].mass;
-		
-			currentP[i].velocity = currentP[i].position - currentP[i].prevPosition;
-			float timeStepSq = (float)timePassedInSeconds * (float)timePassedInSeconds;
-			
-			//Update velocity
-			nextP[i].velocity=currentP[i].velocity*(1.0-damper);
-			nextP[i].prevPosition = currentP[i].position;
 
-			//Calculate new position
-			nextP[i].position=currentP[i].position + nextP[i].velocity+acceleration*timeStepSq;;
+			//VERLET INTEGRATION: Calculate new position
+			nextP[i].position=currentP[i].position + ((currentP[i].position - currentP[i].prevPosition)*(1.0-damper))+acceleration*timeStepSq;;
+			nextP[i].prevPosition = currentP[i].position;
 			acceleration = Vector3f(0,0,0);
 
 			//Check against sphere (at origin)
@@ -579,7 +571,6 @@ void UpdateFrame() {
 			//Check against floor
 			if(nextP[i].position(1) < (-8.5f)) {
 				nextP[i].position(1)=-8.5f;
-				nextP[i].velocity << 0,0,0;
 			}
 
 		}
@@ -721,10 +712,10 @@ void RenderFrame()
 	{
 		
 		glEnable(GL_LIGHTING);
-		GLfloat tri_mat3 [] = {0.6f, 1.0f, 1.0f};
-		GLfloat tri_mat4 [] = {0.4f, 1.0f, 1.0f};
-		GLfloat tri_mat1 [] = {0.6f, 1.0f, 1.0f};
-		GLfloat tri_mat2 [] = {0.4f, 1.0f, 1.0f};
+		GLfloat tri_mat3 [] = {0.4f, 0.0f, 0.0f};
+		GLfloat tri_mat4 [] = {0.35f, 0.0f, 0.0f};
+		GLfloat tri_mat1 [] = {0.4f, 0.0f, 0.0f};
+		GLfloat tri_mat2 [] = {0.35f, 0.0f, 0.0f};
 		glMaterialfv(GL_FRONT, GL_AMBIENT, tri_mat1);	//set material
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, tri_mat2);
 		glMaterialfv(GL_BACK, GL_AMBIENT, tri_mat3);
